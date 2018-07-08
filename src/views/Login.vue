@@ -30,27 +30,18 @@ export default {
   },
   methods: {
     // 点击按钮登录
-    handleLogin() {
-      this.$http
-        .post('login', this.formData)
-        .then((res) => {
-          console.log(res);
-          // 服务器返回的数据
-          const data = res.data;
-          const {meta: {status, msg}} = data;
-          if (status === 200) {
-            // 登录成功
-            const token = data.data.token;
-            // 跳转到后台首页
-            // 记录token,sessionStorage
-            sessionStorage.setItem('token', token);
-            // 成功提示
-            this.$message.success(msg);
-          } else {
-            // 失败提示
-            this.$message.error(msg);
-          }
-        });
+    async handleLogin() {
+      const res = await this.$http.post('login', this.formData);
+      const data = res.data;
+      const {meta: {status, msg}} = data;
+      if (status === 200) {
+        this.$message.success(msg);
+        // 记录token
+        const {data: {token}} = data;
+        sessionStorage.setItem('token', token);
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
