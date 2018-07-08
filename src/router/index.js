@@ -5,7 +5,6 @@ import Login from '@/views/Login';
 import Home from '@/views/Home';
 
 Vue.use(Router);
-
 export default new Router({
   routes: [
     {
