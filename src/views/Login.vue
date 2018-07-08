@@ -41,6 +41,7 @@ export default {
         sessionStorage.setItem('token', token);
       } else {
         this.$message.error(msg);
+        // 跳转
       }
     }
   }
