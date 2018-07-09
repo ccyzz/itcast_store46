@@ -19,6 +19,7 @@
 
     <!-- 表格 -->
     <el-table
+      v-loading="loading"
       stripe
       border
       :data="list"
@@ -75,7 +76,9 @@ export default {
   data() {
     return {
       // 用户列表
-      list: []
+      list: [],
+      // true显示正在加载，false的时候不显示
+      loading: true
     };
   },
   created() {
@@ -85,11 +88,16 @@ export default {
   methods: {
     // 发送异步请求，获取数据
     async loadData() {
+      // 发送异步请求之前
+      this.loading = true;
       // 发送请求之前获取token
       const token = sessionStorage.getItem('token');
       // 在请求头中设置token
       this.$http.defaults.headers.common['Authorization'] = token;
       const res = await this.$http.get('users?pagenum=1&pagesize=10');
+
+      // 异步请求结束
+      this.loading = false;
       const data = res.data;
       const {meta: {msg, status}} = data;
       if (status === 200) {
