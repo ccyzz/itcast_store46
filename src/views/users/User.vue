@@ -90,7 +90,7 @@
         label-width="100px"
         :model="formData">
         <el-form-item label="用户名">
-          <el-input v-model="formData.name" auto-complete="off"></el-input>
+          <el-input v-model="formData.username" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="密码">
           <el-input v-model="formData.password" type="password" auto-complete="off"></el-input>
@@ -104,7 +104,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addUserdialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addUserdialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="handleAdd">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -218,6 +218,27 @@ export default {
           message: '已取消删除'
         });
       });
+    },
+    // 点击添加对话框中的确定按钮时
+    async handleAdd() {
+      const res = await this.$http.post('users', this.formData);
+      const data = res.data;
+      const {meta: {status, msg}} = data;
+      console.log(data);
+      if (status === 201) {
+        // 隐藏对话框
+        this.addUserdialogVisible = false;
+        // 提示成功
+        this.$message.success(msg);
+        // 重新加载页面
+        this.loadData();
+        // 清除数据
+        for (let key in this.formData) {
+          this.formData[key] = '';
+        }
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
