@@ -10,10 +10,14 @@
     <!-- 搜索区域 -->
     <el-row class="searchArea">
       <el-col :span="24">
-          <el-input placeholder="请输入内容" clearable  class="searchInput">
-            <el-button slot="append" icon="el-icon-search"></el-button>
-          </el-input>
-          <el-button type="success" plain>添加用户</el-button>
+        <!-- 搜索功能
+          1，绑定搜索文本框
+          2，给搜索按钮绑定事件
+        -->
+        <el-input placeholder="请输入内容" v-model="searchValue" clearable  class="searchInput">
+            <el-button slot="append" @click="handleSearch" icon="el-icon-search"></el-button>
+        </el-input>
+        <el-button type="success" plain>添加用户</el-button>
       </el-col>
     </el-row>
 
@@ -29,7 +33,7 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="username"
         label="姓名"
         width="100">
       </el-table-column>
@@ -53,6 +57,7 @@
       <template slot-scope="scope">
          <!-- scope.row 就是当前行绑定的数据对象 -->
           <el-switch
+            @change="handleSwitch(scope.row)"
             v-model="scope.row.mg_state"
             active-color="#13ce66"
             inactive-color="#ff4949">
@@ -68,9 +73,19 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 分页 -->
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pagenum"
+      :page-sizes="[2, 4, 6, 8]"
+      :page-size="pagesize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
   </el-card>
 </template>
-
 <script>
 export default {
   data() {
@@ -78,7 +93,11 @@ export default {
       // 用户列表
       list: [],
       // true显示正在加载，false的时候不显示
-      loading: true
+      loading: true,
+      pagenum: 1,
+      pagesize: 5,
+      total: 0,
+      searchValue: ''
     };
   },
   created() {
@@ -86,6 +105,19 @@ export default {
     this.loadData();
   },
   methods: {
+    // 分页
+    handleSizeChange(val) {
+      // 每页数据改变的时候
+      this.pagesize = val;
+      this.loadData();
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      // 页码改变的时候
+      this.pagenum = val;
+      this.loadData();
+      console.log(`当前页: ${val}`);
+    },
     // 发送异步请求，获取数据
     async loadData() {
       // 发送异步请求之前
@@ -94,15 +126,35 @@ export default {
       const token = sessionStorage.getItem('token');
       // 在请求头中设置token
       this.$http.defaults.headers.common['Authorization'] = token;
-      const res = await this.$http.get('users?pagenum=1&pagesize=10');
-
+      const res = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}&query=${this.searchValue}`);
       // 异步请求结束
       this.loading = false;
       const data = res.data;
+
       const {meta: {msg, status}} = data;
       if (status === 200) {
-        const {data: {users}} = data;
+        const {data: {users, total}} = data;
+        // console.log(users);
         this.list = users;
+        // 获取总条数
+        this.total = total;
+      } else {
+        this.$message.error(msg);
+      }
+    },
+    // 搜索事件
+    handleSearch() {
+      this.loadData();
+    },
+    // 用户状态事件
+    // 当开关的状态发生改变时
+    async handleSwitch(user) {
+      const res = await this.$http.put(`users/${user.id}/state/${user.mg_state}`);
+      const data = res.data;
+      // console.log(data); {data: {}, meta: {}}
+      const {meta: {status, msg}} = data;
+      if (status === 200) {
+        this.$message.success(msg);
       } else {
         this.$message.error(msg);
       }
