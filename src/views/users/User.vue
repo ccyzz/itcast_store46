@@ -17,7 +17,7 @@
         <el-input placeholder="请输入内容" v-model="searchValue" clearable  class="searchInput">
             <el-button slot="append" @click="handleSearch" icon="el-icon-search"></el-button>
         </el-input>
-        <el-button type="success" plain>添加用户</el-button>
+        <el-button type="success" plain  @click="addUserdialogVisible = true">添加用户</el-button>
       </el-col>
     </el-row>
 
@@ -84,6 +84,29 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
+    <!-- 添加用户的弹出框 -->
+    <el-dialog title="添加用户" :visible.sync="addUserdialogVisible">
+      <el-form
+        label-width="100px"
+        :model="formData">
+        <el-form-item label="用户名">
+          <el-input v-model="formData.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="formData.password" type="password" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="formData.email" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="formData.mobile" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addUserdialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addUserdialogVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 <script>
@@ -97,7 +120,16 @@ export default {
       pagenum: 1,
       pagesize: 5,
       total: 0,
-      searchValue: ''
+      searchValue: '',
+      // 控制添加用户的对话框显示或隐藏
+      addUserdialogVisible: false,
+      // 绑定表单数据
+      formData: {
+        username: '',
+        password: '',
+        email: '',
+        mobile: ''
+      }
     };
   },
   created() {
