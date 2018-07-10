@@ -87,12 +87,14 @@
     <!-- 添加用户的弹出框 -->
     <el-dialog title="添加用户" :visible.sync="addUserdialogVisible">
       <el-form
+        ref= "myform"
+        :rules= "myRules"
         label-width="100px"
         :model="formData">
-        <el-form-item label="用户名">
+        <el-form-item label="用户名" prop="username">
           <el-input v-model="formData.username" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="密码" prop="password">
           <el-input v-model="formData.password" type="password" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="邮箱">
@@ -129,6 +131,17 @@ export default {
         password: '',
         email: '',
         mobile: ''
+      },
+      // 表单验证规则
+      myRules: {
+        username: [
+          { required: true, message: '请输用户名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'blur' }
+        ]
       }
     };
   },
@@ -221,24 +234,31 @@ export default {
     },
     // 点击添加对话框中的确定按钮时
     async handleAdd() {
-      const res = await this.$http.post('users', this.formData);
-      const data = res.data;
-      const {meta: {status, msg}} = data;
-      console.log(data);
-      if (status === 201) {
-        // 隐藏对话框
-        this.addUserdialogVisible = false;
-        // 提示成功
-        this.$message.success(msg);
-        // 重新加载页面
-        this.loadData();
-        // 清除数据
-        for (let key in this.formData) {
-          this.formData[key] = '';
+      // 表单验证
+      this.$refs.myform.validate(async (valid) => {
+        if (!valid) {
+          return this.message.error('请输入完整内容');
         }
-      } else {
-        this.$message.error(msg);
-      }
+        // 验证成功
+        const res = await this.$http.post('users', this.formData);
+        const data = res.data;
+        const {meta: {status, msg}} = data;
+        console.log(data);
+        if (status === 201) {
+          // 隐藏对话框
+          this.addUserdialogVisible = false;
+          // 提示成功
+          this.$message.success(msg);
+          // 重新加载页面
+          this.loadData();
+          // 清除数据
+          for (let key in this.formData) {
+            this.formData[key] = '';
+          }
+        } else {
+          this.$message.error(msg);
+        }
+      });
     }
   }
 };
