@@ -67,9 +67,9 @@
       <el-table-column
        label="操作">
         <template slot-scope="scope">
-          <el-button plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
+          <el-button @click="handleShowEditDialog(scope.row)" plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
           <el-button @click="handleDel(scope.row.id)" plain size="mini" type="danger" icon="el-icon-delete" ></el-button>
-          <el-button plain size="mini" type="success" icon="el-icon-check" ></el-button>
+          <el-button @click="setRoleDialogVisible = true" plain size="mini" type="success" icon="el-icon-check" ></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -84,8 +84,9 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
+
     <!-- 添加用户的弹出框 -->
-    <el-dialog title="添加用户" :visible.sync="addUserdialogVisible">
+    <el-dialog @closed="handleClosed" title="添加用户" :visible.sync="addUserdialogVisible">
       <el-form
         ref= "myform"
         :rules= "myRules"
@@ -107,6 +108,49 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="addUserdialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleAdd">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 编辑用户的弹出框 -->
+    <el-dialog @closed="handleClosed" title="编辑用户" :visible.sync="editUserdialogVisible">
+      <el-form
+        ref= "myform"
+        :rules= "myRules"
+        label-width="100px"
+        :model="formData">
+        <el-form-item label="用户名" prop="username">
+          <el-input disable v-model="formData.username" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="formData.email" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="formData.mobile" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editUserdialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleEdit">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 分配用户角色的弹出框 -->
+    <el-dialog title="分配角色" :visible.sync="setRoleDialogVisible">
+      <el-form
+        label-width="100px">
+        <el-form-item label="用户名" prop="username">
+          <el-input disable auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="vaule">
+            <el-option label="请选择" disabled value="-1">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="setRoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -142,7 +186,11 @@ export default {
           { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'blur' }
         ]
-      }
+      },
+      // 控制编辑用户的对话框显示或隐藏
+      editUserdialogVisible: false,
+      // 控制分配角色的对话框显示或隐藏
+      setRoleDialogVisible: false
     };
   },
   created() {
@@ -252,13 +300,55 @@ export default {
           // 重新加载页面
           this.loadData();
           // 清除数据
-          for (let key in this.formData) {
-            this.formData[key] = '';
-          }
+          // for (let key in this.formData) {
+          //   this.formData[key] = '';
+          // }
         } else {
           this.$message.error(msg);
         }
       });
+    },
+    // 点击编辑按钮，弹出对话框
+    handleShowEditDialog(user) {
+      // 显示对话框
+      this.editUserdialogVisible = true;
+      // 文本框显示用户信息
+      this.formData.username = user.username;
+      this.formData.mobile = user.mobile;
+      this.formData.email = user.email;
+      this.formData.id = user.id;
+    },
+    // 点击编辑对话框中的确定按钮，实现编辑功能
+    async handleEdit() {
+      const res = await this.$http.put(`users/${this.formData.id}`, {
+        mobile: this.formData.mobile,
+        email: this.formData.email
+      });
+      const data = res.data;
+      const {meta: {status, msg}} = data;
+      if (status === 200) {
+        // 修改成功
+        // 提示修改成功
+        this.$message.success(msg);
+        // 关闭对话框
+        this.editUserdialogVisible = false;
+        // 重新加载数据
+        this.loadData();
+        // // 清空文本框
+        // for (let key in this.formData) {
+        //   this.formData[key] = '';
+        // }
+      } else {
+        // 修改失败
+        this.$message.error(msg);
+      }
+    },
+    // 添加和修改的对话框关闭以后执行
+    handleClosed() {
+      // 清空文本框
+      for (let key in this.formData) {
+        this.formData[key] = '';
+      }
     }
   }
 };
