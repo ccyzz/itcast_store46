@@ -63,9 +63,9 @@ export default {
       // 发送异步请求之前
       this.loading = true;
       // 发送请求之前获取token
-      const token = sessionStorage.getItem('token');
+      // const token = sessionStorage.getItem('token');
       // 在请求头中设置token
-      this.$http.defaults.headers.common['Authorization'] = token;
+      // this.$http.defaults.headers.common['Authorization'] = token;
       const res = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}&query=${this.searchValue}`);
       // 异步请求结束
       this.loading = false;

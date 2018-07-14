@@ -54,9 +54,9 @@ export default {
     // 加载权限列表
     async loadData() {
       // 发送请求之前获取token
-      const token = sessionStorage.getItem('token');
+      // const token = sessionStorage.getItem('token');
       // 在请求头中设置token
-      this.$http.defaults.headers.common['Authorization'] = token;
+      // this.$http.defaults.headers.common['Authorization'] = token;
       const res = await this.$http.get('rights/list');
       const data = res.data;
       // console.log(data);
