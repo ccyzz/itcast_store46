@@ -53,6 +53,10 @@
               </el-row>
             </el-col>
           </el-row>
+          <!-- 未分配权限 -->
+          <el-row v-if="scope.row.children.length === 0">
+            <el-col :span="24">未分配权限</el-col>
+          </el-row>
         </template>
       </el-table-column>
       <el-table-column
