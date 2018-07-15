@@ -25,7 +25,7 @@
             :key="item1.id">
             <el-col :span="4">
               <!-- 展示一级权限 -->
-              <el-tag>{{item1.authName}}</el-tag>
+              <el-tag class="level1" closable>{{item1.authName}}</el-tag>
               <i class="el-icon-arrow-right"></i>
             </el-col>
             <!-- 二级、三级权限 -->
@@ -36,12 +36,14 @@
                 :key="item2.id">
                 <el-col :span="4">
                   <!-- 显示二级权限 -->
-                  <el-tag type="success">{{item2.authName}}</el-tag>
+                  <el-tag closable type="success">{{item2.authName}}</el-tag>
                   <i class="el-icon-arrow-right"></i>
                 </el-col>
                 <el-col :span="20">
                   <!-- 三级权限 -->
                   <el-tag
+                    class="level3"
+                    closable
                     v-for="item3 in item2.children"
                     :key="item3.id"
                     type="warning">
@@ -114,5 +116,12 @@ export default {
 .row-add {
   margin-top: 10px;
   margin-bottom: 10px;
+}
+.level1 {
+  margin-bottom: 10px;
+}
+.level3 {
+  margin-bottom: 5px;
+  margin-right: 5px;
 }
 </style>
