@@ -19,7 +19,28 @@
       <!-- 展示列 -->
       <el-table-column type="expand">
         <template slot-scope="scope">
-          hhscah
+          <!-- 一级权限 item1 -->
+          <el-row
+            v-for="item1 in scope.row.children"
+            :key="item1.id">
+            <el-col :span="4">
+              <!-- 展示一级权限 -->
+              <el-tag>{{item1.authName}}</el-tag>
+            </el-col>
+            <!-- 二级、三级权限 -->
+            <el-col :span="20">
+              <!-- 二级权限 -->
+              <el-row
+                v-for="item2 in item1.children"
+                :key="item2.id">
+                <el-col :span="4">
+                  <!-- 显示二级权限 -->
+                  <el-tag type="success">{{item2.authName}}</el-tag>
+                </el-col>
+                <el-col :span="20"></el-col>
+              </el-row>
+            </el-col>
+          </el-row>
         </template>
       </el-table-column>
       <el-table-column
@@ -71,6 +92,9 @@ export default {
       } else {
         this.$message.error(msg);
       }
+    },
+    hanldeClose() {
+      console.log(1);
     }
   }
 };
