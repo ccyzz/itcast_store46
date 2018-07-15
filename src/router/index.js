@@ -5,6 +5,9 @@ import Login from '@/views/Login';
 import Home from '@/views/Home';
 import User from '@/views/Users/User';
 import Rights from '@/views/roles/Rights';
+import Roles from '@/views/roles/Roles';
+import Category from '@/views/goods/Category';
+// import OrderList from '@/views/orders/List';
 
 Vue.use(Router);
 export default new Router({
@@ -29,7 +32,22 @@ export default new Router({
           name: 'rights',
           path: '/rights',
           component: Rights
+        },
+        {
+          name: 'category',
+          path: '/categories',
+          component: Category
+        },
+        {
+          name: 'roles',
+          path: '/roles',
+          component: Roles
         }
+        // {
+        //   name: 'orders',
+        //   path: '/orders',
+        //   component: OrderList
+        // }
       ]
     }
   ]
