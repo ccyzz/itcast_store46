@@ -16,6 +16,12 @@
       stripe
       :data="list"
       style="width: 100%">
+      <!-- 展示列 -->
+      <el-table-column type="expand">
+        <template slot-scope="scope">
+          hhscah
+        </template>
+      </el-table-column>
       <el-table-column
         type="index"
         width="50">
